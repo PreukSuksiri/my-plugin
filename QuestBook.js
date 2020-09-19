@@ -2,6 +2,7 @@
 // QuestBook.js (Ver1.0.1)
 //=============================================================================
 // 2020.Sep.17 Ver1.0.0  First Release
+// 2020.Sep.19 Ver1.0.0  Start Quest / End Quest Added
 
 /*:
  * @target MZ
@@ -45,6 +46,26 @@
  * @command ShowUnfinishedQuest
  * @text ShowUnfinishedQuest
  * @desc Show unfinished quest
+   *================================================
+  * @command StartQuest
+ * @text StartQuest
+ * @desc Start a quest
+ *
+ * @arg questName
+ * @type string
+ * @default 
+ * @text Quest Name
+ * @desc Your quest name (Thai Language Supported)
+ *================================================
+  * @command FinishQuest
+ * @text FinishQuest
+ * @desc Finish a quest
+ *
+ * @arg questName
+ * @type string
+ * @default 
+ * @text Quest Name
+ * @desc Your quest name (Thai Language Supported)
  */
 
 (() => {
@@ -168,5 +189,15 @@
 		
     });
 	
-
+	PluginManager.registerCommand(pluginName, "StartQuest", args => {
+        const questName = args.questName;
+		Game_Message.prototype.allQuest[questName]["Status"] = "Unfinished";
+    });
+	
+    PluginManager.registerCommand(pluginName, "FinishQuest", args => {
+        const questName = args.questName;
+		Game_Message.prototype.allQuest[questName]["Status"] = "Complete";
+    });
+	
+	
 })();
