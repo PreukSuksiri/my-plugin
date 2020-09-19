@@ -2,7 +2,7 @@
 // QuestBook.js (Ver1.0.1)
 //=============================================================================
 // 2020.Sep.17 Ver1.0.0  First Release
-// 2020.Sep.19 Ver1.0.0  Start Quest / End Quest Added
+// 2020.Sep.19 Ver1.0.1  Start Quest / End Quest Added
 
 /*:
  * @target MZ
