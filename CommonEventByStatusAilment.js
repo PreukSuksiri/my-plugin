@@ -8,7 +8,7 @@
  * @plugindesc Call common event when a status ailment is added to or removed from a player.
  * @author Preuk Suksiri
  *
- * @help ButtonPicture.js
+ * @help CommonEventByStatusAilment.js
  *
  * This plugin calls common event when a status ailment is added to or removed from a player.
  *
