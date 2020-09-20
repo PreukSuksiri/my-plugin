@@ -15,8 +15,8 @@
  *
  * !IMPORTANT! You need to call "RegisterQuest" plugin command at the start of the game. 
  * When you want to open quest book, you call "ShowAllQuest" or "ShowCompletedQuest" or "ShowUnfinishedQuest" plugin command.
- * When you want to check if the "WolfHunt" quest is completed, you use "Conditional Branch" command to check for script Game_Message.prototype.allQuest["WolfHunt"]["Status"] == "Complete"
-  * When you want to check if the "WolfHunt" quest is already started, you use "Conditional Branch" command to check for script Game_Message.prototype.allQuest["WolfHunt"]["Status"] != ""
+ * When you want to check if the "WolfHunt" quest is completed, you use "Conditional Branch" command to check for script $gameSystem.allQuest["WolfHunt"]["Status"] == "Complete"
+  * When you want to check if the "WolfHunt" quest is already started, you use "Conditional Branch" command to check for script $gameSystem.allQuest["WolfHunt"]["Status"] != ""
  * 
  *
  * @command RegisterQuest
@@ -70,134 +70,150 @@
 
 (() => {
 
-  const pluginName = 'QuestBook';
+	var fnCreateObject = DataManager.createGameObjects;
+	
+	DataManager.createGameObjects = function(){
+		fnCreateObject();
+		fnAddtional();
+	}
 
-	PluginManager.registerCommand(pluginName, "RegisterQuest", args => {
-        const questName = args.questName;
-		const commonEventBind = Number(args.commonEventBind);
+	var fnAddtional = function(){
 		
-		
-		if ("resultChoice" in Game_Message.prototype == false)
-		{
-			Game_Message.prototype.resultChoice = "";
+		 const pluginName = 'QuestBook';
+
+		PluginManager.registerCommand(pluginName, "RegisterQuest", args => {
+			const questName = args.questName;
+			const commonEventBind = Number(args.commonEventBind);
 			
-		}
-
-		if ("allQuest" in Game_Message.prototype == false)
-		{
-			Game_Message.prototype.allQuest = {};
 			
-		}
+			if ("resultChoice" in $gameTemp == false)
+			{
+				$gameTemp.resultChoice = "";
+				
+			}
 
-		Game_Message.prototype.allQuest[questName] = {};
-		Game_Message.prototype.allQuest[questName]["CommonEvent"] = commonEventBind;
-		Game_Message.prototype.allQuest[questName]["Status"] = "";
-		
-    });
-	
-	
-	
-	PluginManager.registerCommand(pluginName, "ShowAllQuest", args => {
-        iconComplete = '\\i[89]';
-		choices = []; params = []; 
-		$gameMessage.setChoices(choices, 0) 
+			if ("allQuest" in $gameSystem == false)
+			{
+				$gameSystem.allQuest = {};
+				
+			}
 
-		for (var q in Game_Message.prototype.allQuest)
-		{
-		 if(Game_Message.prototype.allQuest[q]["Status"] == "Complete")
-		 {
-		  choices.push(iconComplete+q);
-		 }
-		 else if(Game_Message.prototype.allQuest[q]["Status"] == "Unfinished")
-		 {
-		  choices.push(q);
-		 }
-		}
-		Game_Message.prototype._choiceCancelType = -1;
-		params.push()
-		$gameMessage.setChoiceCallback(function(responseIndex) {
-		if (responseIndex >= 0) {Game_Message.prototype.resultChoice = $gameMessage._choices[responseIndex]; } 
-		for (var q in Game_Message.prototype.allQuest)
-		{
-		 if(Game_Message.prototype.resultChoice.indexOf(q) >= 0)
-		 {
-		  $gameTemp.reserveCommonEvent(Game_Message.prototype.allQuest[q]["CommonEvent"]);
-
-		 }
-		}
+			$gameSystem.allQuest[questName] = {};
+			$gameSystem.allQuest[questName]["CommonEvent"] = commonEventBind;
+			$gameSystem.allQuest[questName]["Status"] = "";
+			
 		});
 		
-    });
-	
+		
+		
+		PluginManager.registerCommand(pluginName, "ShowAllQuest", args => {
+			iconComplete = '\\i[89]';
+			choices = []; params = []; 
+			$gameMessage.setChoices(choices, 0);
+			for (var q in $gameSystem.allQuest)
+			{
+			 if($gameSystem.allQuest[q]["Status"] == "Complete")
+			 {
+			  choices.push(iconComplete+q);
+			 }
+			 else if($gameSystem.allQuest[q]["Status"] == "Unfinished")
+			 {
+			  choices.push(q);
+			 }
+			}
+			$gameMessage._choiceCancelType = -1;
+			params.push()
+			$gameMessage.setChoiceCallback(function(responseIndex) {
+			if (responseIndex >= 0) {$gameTemp.resultChoice = $gameMessage._choices[responseIndex]; } 
+			for (var q in $gameSystem.allQuest)
+			{
+			 if($gameTemp.resultChoice.indexOf(q) >= 0)
+			 {
+			  $gameTemp.reserveCommonEvent($gameSystem.allQuest[q]["CommonEvent"]);
 
-	
-	PluginManager.registerCommand(pluginName, "ShowCompletedQuest", args => {
-        iconComplete = '\\i[89]';
-		choices = []; params = []; 
-		$gameMessage.setChoices(choices, 0) 
-
-		for (var q in Game_Message.prototype.allQuest)
-		{
-		 if(Game_Message.prototype.allQuest[q]["Status"] == "Complete")
-		 {
-		  choices.push(iconComplete+q);
-		 }
-		 
-		}
-		params.push()
-		$gameMessage.setChoiceCallback(function(responseIndex) {
-		if (responseIndex >= 0) {Game_Message.prototype.resultChoice = $gameMessage._choices[responseIndex]; } 
-		for (var q in Game_Message.prototype.allQuest)
-		{
-		 if(Game_Message.prototype.resultChoice.indexOf(q) >= 0)
-		 {
-		  $gameTemp.reserveCommonEvent(Game_Message.prototype.allQuest[q]["CommonEvent"]);
-
-		 }
-		}
+			 }
+			}
+			});
+			
 		});
 		
-    });
-	
-	
-	
-	PluginManager.registerCommand(pluginName, "ShowUnfinishedQuest", args => {
-        iconComplete = '\\i[89]';
-		choices = []; params = []; 
-		$gameMessage.setChoices(choices, 0) 
 
-		for (var q in Game_Message.prototype.allQuest)
-		{
-		 if(Game_Message.prototype.allQuest[q]["Status"] == "Unfinished")
-		 {
-		  choices.push(q);
-		 }
-		 
-		}
-		params.push()
-		$gameMessage.setChoiceCallback(function(responseIndex) {
-		if (responseIndex >= 0) {Game_Message.prototype.resultChoice = $gameMessage._choices[responseIndex]; } 
-		for (var q in Game_Message.prototype.allQuest)
-		{
-		 if(Game_Message.prototype.resultChoice.indexOf(q) >= 0)
-		 {
-		  $gameTemp.reserveCommonEvent(Game_Message.prototype.allQuest[q]["CommonEvent"]);
+		
+		PluginManager.registerCommand(pluginName, "ShowCompletedQuest", args => {
+			iconComplete = '\\i[89]';
+			choices = []; params = []; 
+			$gameMessage.setChoices(choices, 0) 
 
-		 }
-		}
+			for (var q in $gameSystem.allQuest)
+			{
+			 if($gameSystem.allQuest[q]["Status"] == "Complete")
+			 {
+			  choices.push(iconComplete+q);
+			 }
+			 
+			}
+			params.push()
+			$gameMessage.setChoiceCallback(function(responseIndex) {
+			if (responseIndex >= 0) {$gameTemp.resultChoice = $gameMessage._choices[responseIndex]; } 
+			for (var q in $gameSystem.allQuest)
+			{
+			 if($gameTemp.resultChoice.indexOf(q) >= 0)
+			 {
+			  $gameTemp.reserveCommonEvent($gameSystem.allQuest[q]["CommonEvent"]);
+
+			 }
+			}
+			});
+			
 		});
 		
-    });
-	
-	PluginManager.registerCommand(pluginName, "StartQuest", args => {
-        const questName = args.questName;
-		Game_Message.prototype.allQuest[questName]["Status"] = "Unfinished";
-    });
-	
-    PluginManager.registerCommand(pluginName, "FinishQuest", args => {
-        const questName = args.questName;
-		Game_Message.prototype.allQuest[questName]["Status"] = "Complete";
-    });
+		
+		
+		PluginManager.registerCommand(pluginName, "ShowUnfinishedQuest", args => {
+			iconComplete = '\\i[89]';
+			choices = []; params = []; 
+			$gameMessage.setChoices(choices, 0) 
+
+			for (var q in $gameSystem.allQuest)
+			{
+			 if($gameSystem.allQuest[q]["Status"] == "Unfinished")
+			 {
+			  choices.push(q);
+			 }
+			 
+			}
+			params.push()
+			$gameMessage.setChoiceCallback(function(responseIndex) {
+			if (responseIndex >= 0) {$gameTemp.resultChoice = $gameMessage._choices[responseIndex]; } 
+			for (var q in $gameSystem.allQuest)
+			{
+			 if($gameTemp.resultChoice.indexOf(q) >= 0)
+			 {
+			  $gameTemp.reserveCommonEvent($gameSystem.allQuest[q]["CommonEvent"]);
+
+			 }
+			}
+			});
+			
+		});
+		
+		PluginManager.registerCommand(pluginName, "StartQuest", args => {
+			const questName = args.questName;
+			$gameSystem.allQuest[questName]["Status"] = "Unfinished";
+		});
+		
+		PluginManager.registerCommand(pluginName, "FinishQuest", args => {
+			const questName = args.questName;
+			$gameSystem.allQuest[questName]["Status"] = "Complete";
+		});
+		
+		
+		
+		
+		
+		
+	}
+ 
 	
 	
 })();
