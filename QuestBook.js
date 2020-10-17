@@ -95,6 +95,7 @@
 			if ("allQuest" in $gameSystem == false)
 			{
 				$gameSystem.allQuest = {};
+				$gameSystem.allQuest[questName] = {};
 				$gameSystem.allQuest[questName]["CommonEvent"] = commonEventBind;
 				$gameSystem.allQuest[questName]["Status"] = "";
 				
